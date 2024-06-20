@@ -125,7 +125,9 @@ def analyze_data(device_id):
 @app.route("/devices", methods=["GET"])
 def get_devices():
     devices = (
-        db.session.query(SensorData.device_id, SensorData.location).distinct().all()
+        db.session.query(SensorData.device_id, db.func.max(SensorData.location))
+        .group_by(SensorData.device_id)
+        .all()
     )
     result = [{"device_id": device[0], "location": device[1]} for device in devices]
     return jsonify(result), 200
